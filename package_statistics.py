@@ -19,7 +19,7 @@ def query(architecture):
         for link in directorylist: 
             href = link.get('href')
             # if href and href.startswith('Contents-') and href.endswith('.gz') and architecture in href:
-            if re.search(rf'Contents-.*{re.escape(architecture)}.*.gz', href):
+            if re.search(rf'Contents-(?!udeb).*{re.escape(architecture)}.*.gz', href):
                 print(f'{i}. {href}')
                 i += 1
 

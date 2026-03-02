@@ -25,13 +25,13 @@ def query(architecture):
                     and pattern.search(href)]
         
         for href in my_links:
-            print(f'Using contents file: {href}')
+            print(f'Using contents file: {href}\n')
             response = requests.get(url + href)
 
             packages = {}
             if response.status_code == 200:
                 
-                # get content directly into string to avoid having to write to disk and read
+                # get content directly into string to avoid having to write to memory and read
                 with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
                     output = f.read().decode('utf-8')
 
@@ -39,20 +39,23 @@ def query(architecture):
                     # vs decoding line by line
                     line_output = output.splitlines()
                     for line in line_output:
-                        # print(line)
                         thispkg = line.rsplit(maxsplit=1)[-1]
-                        # print(thispkg)
-                        if thispkg in packages:
-                            packages[thispkg] += 1
-                        else:
-                            packages[thispkg] = 1
+                        
+                        # clean_packages = [pkg.split('/')[-1] for pkg in thispkg.split(',')]
+                        clean_packages = thispkg.split(',')
+
+                        for pkg in clean_packages:
+                            if pkg in packages:
+                                packages[pkg] += 1
+                            else:
+                                packages[pkg] = 1
                     
                     package_heap = [(value, key) for key, value in packages.items()]
                     heapq.heapify(package_heap)
 
                     for i in range(10):
                         value, key = heapq.heappop(package_heap)
-                        print(f'{i+1}. {key} {value} occurrences')
+                        print(f'{i+1}. {key}    {value} occurrences')
             
             print(f'--------------------------------')
 

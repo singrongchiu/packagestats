@@ -21,7 +21,7 @@ def query(architecture):
         
         my_links = []
 
-        # regex pattern (no micro packages)
+        # regex pattern (no udeb packages)
         pattern = re.compile(rf'Contents-(?!udeb).*{re.escape(architecture)}.*\.gz') 
         my_links = [href for link in directorylist if (href := link.get('href')) 
                     and pattern.search(href)]
@@ -39,10 +39,10 @@ def query(architecture):
 
                     line_output = output.splitlines()
                     for line in line_output:
+                        # split from the right since assuming that package names won't have string glob problem
                         thispkg = line.rsplit(maxsplit=1)[-1]
                         
                         clean_packages = thispkg.split(',') # if there are multiple packages for one file
-                        print(clean_packages)
 
                         for pkg in clean_packages:
                             if pkg in packages:
@@ -50,7 +50,7 @@ def query(architecture):
                             else:
                                 packages[pkg] = 1
                     
-                    package_heap = [(value, key) for key, value in packages.items()]
+                    package_heap = [(value, key) for key, value in packages.items()] # put value in front of tuple so heapify can pick it up
                     heapq.heapify_max(package_heap)
 
                     for i in range(10):

@@ -35,21 +35,19 @@ def query(architecture):
                 with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
                     output = f.read().decode('utf-8')
 
-                    # TODO: test between splitting after decoding all
+                    # TODO: test speed between splitting after decoding all
                     # vs decoding line by line
-
                     line_output = output.splitlines()
                     for line in line_output:
-                        print(line)
-                        thispkg = line.split()[1]
-                        print(thispkg)
+                        # print(line)
+                        thispkg = line.rsplit(maxsplit=1)[-1]
+                        # print(thispkg)
                         if thispkg in packages:
                             packages[thispkg] += 1
                         else:
                             packages[thispkg] = 1
                     
                     package_heap = [(value, key) for key, value in packages.items()]
-
                     heapq.heapify(package_heap)
 
                     for i in range(10):
@@ -57,9 +55,6 @@ def query(architecture):
                         print(f'{i+1}. {key} {value} occurrences')
             
             print(f'--------------------------------')
-
-    # print(f'{i}. {href}')
-
 
 
 if __name__ == "__main__":

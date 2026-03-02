@@ -1,27 +1,37 @@
+import io
 import time
 import argparse
 import requests
 from bs4 import BeautifulSoup
 import re
+import gzip
 
 url = "http://ftp.uk.debian.org/debian/dists/stable/main/"
 
 def query(architecture):
+    packages = []
 
     response = requests.get(url)
 
     if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
 
+        soup = BeautifulSoup(response.text, 'html.parser')
         directorylist = soup.find_all('a')
         
-        i = 1
         for link in directorylist: 
             href = link.get('href')
+
             # if href and href.startswith('Contents-') and href.endswith('.gz') and architecture in href:
             if re.search(rf'Contents-(?!udeb).*{re.escape(architecture)}.*.gz', href):
-                print(f'{i}. {href}')
-                i += 1
+                response = requests.get(url + href)
+
+                if response.status_code == 200:
+                    with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
+                        output = f.read().decode('utf-8')
+                        print(output)
+
+
+    # print(f'{i}. {href}')
 
 
 
@@ -35,4 +45,4 @@ if __name__ == "__main__":
     # end_time = time.perf_counter()
 
     # elapsed_time = end_time - start_time
-    # print(f"Query exec time: {elapsed_time:.4f} seconds")
+    # print(f"Query exec time: {elapsed_time:.4f} sec")

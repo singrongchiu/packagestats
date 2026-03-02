@@ -5,30 +5,53 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import gzip
+import heapify
 
 url = "http://ftp.uk.debian.org/debian/dists/stable/main/"
 
 def query(architecture):
-    packages = []
-
     response = requests.get(url)
 
     if response.status_code == 200:
 
         soup = BeautifulSoup(response.text, 'html.parser')
-        directorylist = soup.find_all('a')
+        directorylist = soup.find_all('a') # find all links in the page
         
-        for link in directorylist: 
-            href = link.get('href')
+        my_links = []
 
-            # if href and href.startswith('Contents-') and href.endswith('.gz') and architecture in href:
-            if re.search(rf'Contents-(?!udeb).*{re.escape(architecture)}.*.gz', href):
-                response = requests.get(url + href)
+        # regex pattern
+        pattern = re.compile(rf'Contents-(?!udeb).*{re.escape(architecture)}.*\.gz') 
+        my_links = [href for link in directorylist if (href := link.get('href')) 
+                    and pattern.search(href)]
+        
+        for href in my_links:
+            response = requests.get(url + href)
 
-                if response.status_code == 200:
-                    with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
-                        output = f.read().decode('utf-8')
-                        print(output)
+            packages = []
+            if response.status_code == 200:
+                
+                # get content directly into string to avoid having to write to disk and read
+                with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
+                    output = f.read().decode('utf-8')
+
+                    # TODO: test between splitting after decoding all
+                    # vs decoding line by line
+
+                    line_output = output.splitlines()
+                    for line in line_output:
+                        thispkg = line.split()
+                        if thispkg in packages:
+                            packages[thispkg] += 1
+                        else:
+                            packages[thispkg] = 1
+                    
+                    package_heap = [(value, key) for key, value in packages.items()]
+
+                    heapq.heapify(package_heap)
+
+
+
+                    
 
 
     # print(f'{i}. {href}')

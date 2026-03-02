@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import gzip
-import heapify
+import heapq
 
 url = "http://ftp.uk.debian.org/debian/dists/stable/main/"
 
@@ -19,15 +19,16 @@ def query(architecture):
         
         my_links = []
 
-        # regex pattern
+        # regex pattern (no micro packages)
         pattern = re.compile(rf'Contents-(?!udeb).*{re.escape(architecture)}.*\.gz') 
         my_links = [href for link in directorylist if (href := link.get('href')) 
                     and pattern.search(href)]
         
         for href in my_links:
+            print(f'Using contents file: {href}')
             response = requests.get(url + href)
 
-            packages = []
+            packages = {}
             if response.status_code == 200:
                 
                 # get content directly into string to avoid having to write to disk and read
@@ -39,7 +40,9 @@ def query(architecture):
 
                     line_output = output.splitlines()
                     for line in line_output:
-                        thispkg = line.split()
+                        print(line)
+                        thispkg = line.split()[1]
+                        print(thispkg)
                         if thispkg in packages:
                             packages[thispkg] += 1
                         else:
@@ -49,10 +52,11 @@ def query(architecture):
 
                     heapq.heapify(package_heap)
 
-
-
-                    
-
+                    for i in range(10):
+                        value, key = heapq.heappop(package_heap)
+                        print(f'{i+1}. {key} {value} occurrences')
+            
+            print(f'--------------------------------')
 
     # print(f'{i}. {href}')
 

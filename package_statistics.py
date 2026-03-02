@@ -57,7 +57,7 @@ def query(architecture):
 
                     for i in range(10):
                         value, key = heapq.heappop_max(package_heap)
-                        print(f'{i+1}. {key}    {value} occurrences')
+                        print(f'{i+1}. {key}    {value} files')
             
             print(f'--------------------------------')
 

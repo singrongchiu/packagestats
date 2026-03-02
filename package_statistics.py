@@ -37,14 +37,12 @@ def query(architecture):
                 with gzip.GzipFile(fileobj=io.BytesIO(response.content)) as f:
                     output = f.read().decode('utf-8')
 
-                    # TODO: test speed between splitting after decoding all
-                    # vs decoding line by line
                     line_output = output.splitlines()
                     for line in line_output:
                         thispkg = line.rsplit(maxsplit=1)[-1]
                         
-                        # clean_packages = [pkg.split('/')[-1] for pkg in thispkg.split(',')]
-                        clean_packages = thispkg.split(',')
+                        clean_packages = thispkg.split(',') # if there are multiple packages for one file
+                        print(clean_packages)
 
                         for pkg in clean_packages:
                             if pkg in packages:
@@ -67,9 +65,4 @@ if __name__ == "__main__":
     parser.add_argument('architecture', help="Architecture to query (ex: amd64, arm64)") 
     args = parser.parse_args()
 
-    # start_time = time.perf_counter()
     query(architecture=args.architecture)
-    # end_time = time.perf_counter()
-
-    # elapsed_time = end_time - start_time
-    # print(f"Query exec time: {elapsed_time:.4f} sec")

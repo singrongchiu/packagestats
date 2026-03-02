@@ -7,6 +7,8 @@ import re
 import gzip
 import heapq
 
+# NOTE: this script requires Python 3.14 to be able to use heapify_max and heappop_max
+
 url = "http://ftp.uk.debian.org/debian/dists/stable/main/"
 
 def query(architecture):
@@ -51,10 +53,10 @@ def query(architecture):
                                 packages[pkg] = 1
                     
                     package_heap = [(value, key) for key, value in packages.items()]
-                    heapq.heapify(package_heap)
+                    heapq.heapify_max(package_heap)
 
                     for i in range(10):
-                        value, key = heapq.heappop(package_heap)
+                        value, key = heapq.heappop_max(package_heap)
                         print(f'{i+1}. {key}    {value} occurrences')
             
             print(f'--------------------------------')

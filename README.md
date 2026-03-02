@@ -13,6 +13,8 @@ source start.sh
 (architecture can be arm64; it can also be arm, which will output results for architectures with "arm" in the name like arm64, armel, armhf)
 ```
 python package_statistics.py [architecture]
+# OR
+./package_statistics.py [architecture]
 ```
 
 #### Implementation details:

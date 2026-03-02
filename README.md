@@ -20,7 +20,7 @@ python package_statistics.py [architecture]
 2. Find all the hyperlinks associated with architecture by parsing all hyperlink tags. They have to match Contents.xxx[architecture]xxx.gz and not include "udeb"
 3. For each of the hyperlinks run a get on the hyperlink url
 4. Instead of downloading contents of the get into a file and reading it, the script gets the response content, directly unzips it, and the output is stored in a string variable
-5. Add to hashmap with packages as the key and the number of files as the value
+5. Add to a hashmap with packages as the key and the number of files as the value. If there are multiple packages (separated by comma), the script will add 1 to all 3 packages in the hashmap. 
 6. Create a max heap in O(logn) time and pop the top 10 entries in the heap
 
 #### Example output
